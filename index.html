@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>55688台灣大車隊企業會員乘車服務 ROI計算器</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <title>企業會員乘車服務 ROI計算器</title>
     <style>
         * {
             margin: 0;
@@ -14,7 +13,7 @@
 
         body {
             font-family: 'Microsoft JhengHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,7 +23,7 @@
             margin: 0 auto;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
@@ -35,28 +34,8 @@
             text-align: center;
         }
 
-        .logo-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .company-logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fbbf24;
-        }
-
-        .company-name {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fbbf24;
-        }
-
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 700;
         }
@@ -73,33 +52,21 @@
             padding: 30px;
         }
 
-        .input-section, .results-section {
+        .input-section {
+            background: #fef3c7;
             border-radius: 15px;
             padding: 25px;
-            border: 2px solid #e2e8f0;
-        }
-
-        .input-section {
-            background: #f8fafc;
-        }
-
-        .results-section {
-            background: #f0f9ff;
-            border-color: #bae6fd;
+            border: 3px solid #f59e0b;
         }
 
         .section-title {
             font-size: 1.4rem;
             font-weight: bold;
             margin-bottom: 20px;
-            color: #475569;
+            color: #92400e;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        .results-section .section-title {
-            color: #0c4a6e;
         }
 
         .input-group {
@@ -123,7 +90,7 @@
         .input-row input {
             flex: 1;
             padding: 12px;
-            border: 2px solid #cbd5e1;
+            border: 2px solid #f59e0b;
             border-radius: 10px;
             font-size: 1.1rem;
             font-weight: bold;
@@ -133,14 +100,26 @@
 
         .input-row input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+            transform: scale(1.02);
         }
 
         .input-row .unit {
             font-weight: bold;
-            color: #64748b;
+            color: #6b7280;
             min-width: 60px;
+        }
+
+        .results-section {
+            background: #dbeafe;
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid #3b82f6;
+        }
+
+        .results-section .section-title {
+            color: #1e40af;
         }
 
         .result-item {
@@ -152,12 +131,6 @@
             background: white;
             border-radius: 8px;
             border-left: 4px solid #3b82f6;
-            transition: transform 0.3s ease;
-        }
-
-        .result-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
         }
 
         .result-label {
@@ -173,15 +146,15 @@
 
         .roi-section {
             grid-column: 1 / -1;
-            background: #f0fdf4;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
             border-radius: 15px;
             padding: 30px;
-            border: 2px solid #bbf7d0;
+            border: 3px solid #22c55e;
             margin-top: 20px;
         }
 
         .roi-section .section-title {
-            color: #166534;
+            color: #15803d;
             font-size: 1.6rem;
             margin-bottom: 25px;
         }
@@ -199,12 +172,10 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: transform 0.3s ease;
-            border: 2px solid #dcfce7;
         }
 
         .roi-card:hover {
             transform: translateY(-5px);
-            border-color: #22c55e;
         }
 
         .roi-card h3 {
@@ -218,16 +189,15 @@
         .roi-card .value {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #166534;
+            color: #15803d;
         }
 
         .scenario-section {
             grid-column: 1 / -1;
-            background: #fafafa;
+            background: #f3f4f6;
             border-radius: 15px;
             padding: 25px;
             margin-top: 20px;
-            border: 2px solid #e5e7eb;
         }
 
         .scenario-section .section-title {
@@ -241,7 +211,7 @@
             background: white;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .scenario-table th {
@@ -262,18 +232,9 @@
             background: #f8fafc;
         }
 
-        .positive { color: #16a34a !important; font-weight: bold; }
-        .warning { color: #ea580c !important; font-weight: bold; }
-        .negative { color: #dc2626 !important; font-weight: bold; }
-
-        .chart-container {
-            grid-column: 1 / -1;
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
-            border: 2px solid #e5e7eb;
-        }
+        .positive { color: #16a34a !important; }
+        .warning { color: #ea580c !important; }
+        .negative { color: #dc2626 !important; }
 
         .control-buttons {
             grid-column: 1 / -1;
@@ -298,18 +259,16 @@
         .btn-primary {
             background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            background: linear-gradient(135deg, #6b7280 0%, #374151 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
         }
 
         @media (max-width: 768px) {
@@ -319,34 +278,32 @@
                 padding: 20px;
             }
             
-            .company-name, .company-logo {
-                font-size: 2rem;
-            }
-            
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 2rem;
             }
             
             .control-buttons {
                 flex-direction: column;
                 align-items: center;
             }
-            
-            .roi-grid {
-                grid-template-columns: 1fr;
-            }
+        }
+
+        .highlight-animation {
+            animation: highlight 0.5s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0% { background-color: #fef3c7; }
+            50% { background-color: #fbbf24; }
+            100% { background-color: white; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo-section">
-                <div class="company-logo">55688</div>
-                <div class="company-name">台灣大車隊</div>
-            </div>
             <h1>企業會員乘車服務 ROI計算器</h1>
-            <p>安全・舒適・貼心 | 專業版投資報酬率分析工具</p>
+            <p>專業版投資報酬率分析工具 - 客戶洽談專用</p>
         </div>
 
         <div class="main-content">
@@ -363,7 +320,7 @@
                 </div>
 
                 <div class="input-group">
-                    <label>每月乘車次數</label>
+                    <label>每月差旅次數</label>
                     <div class="input-row">
                         <input type="number" id="trips" value="50" min="1">
                         <span class="unit">次</span>
@@ -381,7 +338,7 @@
                 <div class="input-group">
                     <label>每月報帳處理時間</label>
                     <div class="input-row">
-                        <input type="number" id="adminTime" value="15" min="1">
+                        <input type="number" id="adminTime" value="20" min="1">
                         <span class="unit">小時</span>
                     </div>
                 </div>
@@ -395,10 +352,18 @@
                 </div>
 
                 <div class="input-group">
-                    <label>月結信用額度</label>
+                    <label>收據遺失重開比例</label>
                     <div class="input-row">
-                        <input type="number" id="creditLimit" value="50000" min="1000">
-                        <span class="unit">元</span>
+                        <input type="number" id="lossRate" value="10" min="0" max="100">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>服務年費</label>
+                    <div class="input-row">
+                        <input type="number" id="annualFee" value="25000" min="1">
+                        <span class="unit">元/年</span>
                     </div>
                 </div>
             </div>
@@ -413,28 +378,28 @@
                 </div>
 
                 <div class="result-item">
-                    <span class="result-label">資金週轉效益</span>
-                    <span class="result-value" id="cashFlowBenefit">$25</span>
+                    <span class="result-label">資金週轉效益(5%)</span>
+                    <span class="result-value" id="cashFlowBenefit">$750</span>
                 </div>
 
                 <div class="result-item">
                     <span class="result-label">時間成本節省</span>
-                    <span class="result-value" id="timeSaving">$3,000</span>
+                    <span class="result-value" id="timeSaving">$4,000</span>
                 </div>
 
                 <div class="result-item">
                     <span class="result-label">收據處理成本節省</span>
-                    <span class="result-value" id="receiptSaving">$150</span>
+                    <span class="result-value" id="receiptSaving">$250</span>
                 </div>
 
                 <div class="result-item" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
-                    <span class="result-label"><strong>每月總節省</strong></span>
-                    <span class="result-value positive" id="monthlySaving">$3,175</span>
+                    <span class="result-label">每月總節省</span>
+                    <span class="result-value positive" id="monthlySaving">$5,000</span>
                 </div>
 
                 <div class="result-item" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
-                    <span class="result-label"><strong>年度總節省</strong></span>
-                    <span class="result-value positive" id="annualSaving">$38,100</span>
+                    <span class="result-label">年度總節省</span>
+                    <span class="result-value positive" id="annualSaving">$60,000</span>
                 </div>
             </div>
         </div>
@@ -444,24 +409,17 @@
             <div class="section-title">🎯 投資報酬率分析</div>
             <div class="roi-grid">
                 <div class="roi-card">
-                    <h3>車資效益比</h3>
-                    <div class="value" id="fareEfficiencyRatio">21%</div>
-                    <small>額外效益比率</small>
+                    <h3>投資回收期</h3>
+                    <div class="value" id="paybackPeriod">5.0</div>
+                    <small>個月</small>
                 </div>
                 <div class="roi-card">
-                    <h3>年度效益倍數</h3>
-                    <div class="value" id="annualEfficiencyMultiple">0.2倍</div>
-                    <small>年度效益倍增</small>
-                </div>
-                <div class="roi-card">
-                    <h3>成本節省率</h3>
-                    <div class="value" id="costReduction">17%</div>
-                    <small>相較傳統方式</small>
+                    <h3>年度 ROI</h3>
+                    <div class="value" id="annualROI">140%</div>
                 </div>
                 <div class="roi-card">
                     <h3>效率提升</h3>
-                    <div class="value" id="efficiencyGain">100%</div>
-                    <small>處理效率翻倍</small>
+                    <div class="value" id="efficiencyGain">125%</div>
                 </div>
             </div>
         </div>
@@ -480,52 +438,44 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>乘車次數</strong></td>
-                        <td id="conservativeTrips">30次</td>
+                        <td><strong>差旅次數</strong></td>
+                        <td>30次</td>
                         <td id="normalTrips">50次</td>
-                        <td id="optimisticTrips">80次</td>
+                        <td>80次</td>
                     </tr>
                     <tr>
-                        <td><strong>月總節省金額</strong></td>
-                        <td id="conservativeSaving">$1,905</td>
-                        <td id="normalSaving">$3,175</td>
-                        <td id="optimisticSaving">$5,080</td>
+                        <td><strong>月節省金額</strong></td>
+                        <td id="conservativeSaving">$3,850</td>
+                        <td id="normalSaving">$5,000</td>
+                        <td id="optimisticSaving">$7,400</td>
                     </tr>
                     <tr>
-                        <td><strong>車資效益比</strong></td>
-                        <td id="conservativeROI" class="positive">21%</td>
-                        <td id="normalROI" class="positive">21%</td>
-                        <td id="optimisticROI" class="positive">21%</td>
+                        <td><strong>年度ROI</strong></td>
+                        <td id="conservativeROI" class="positive">85%</td>
+                        <td id="normalROI" class="positive">140%</td>
+                        <td id="optimisticROI" class="positive">255%</td>
                     </tr>
                     <tr>
-                        <td><strong>年度總節省</strong></td>
-                        <td id="conservativeAnnual">$22,860</td>
-                        <td id="normalAnnual">$38,100</td>
-                        <td id="optimisticAnnual">$60,960</td>
+                        <td><strong>回收期</strong></td>
+                        <td id="conservativePayback">6.5個月</td>
+                        <td id="normalPayback">5.0個月</td>
+                        <td id="optimisticPayback">3.4個月</td>
                     </tr>
                 </tbody>
             </table>
-        </div>
-
-        <!-- 圖表區域 -->
-        <div class="chart-container">
-            <div class="section-title">📊 視覺化分析圖表</div>
-            <canvas id="roiChart" width="400" height="200"></canvas>
         </div>
 
         <!-- 控制按鈕 -->
         <div class="control-buttons">
             <button class="btn btn-primary" onclick="recalculate()">🔄 重新計算</button>
             <button class="btn btn-secondary" onclick="resetDefaults()">↺ 重設預設值</button>
+            <button class="btn btn-primary" onclick="generateReport()">📊 生成報告</button>
         </div>
     </div>
 
     <script>
-        // 全域變數
-        let roiChart;
-        
         // 自動計算功能
-        const inputs = ['employees', 'trips', 'avgCost', 'adminTime', 'hourlyRate', 'creditLimit'];
+        const inputs = ['employees', 'trips', 'avgCost', 'adminTime', 'hourlyRate', 'lossRate', 'annualFee'];
         
         inputs.forEach(id => {
             document.getElementById(id).addEventListener('input', calculateROI);
@@ -546,24 +496,21 @@
             const avgCost = parseFloat(document.getElementById('avgCost').value) || 0;
             const adminTime = parseFloat(document.getElementById('adminTime').value) || 0;
             const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-            const creditLimit = parseFloat(document.getElementById('creditLimit').value) || 0;
+            const lossRate = parseFloat(document.getElementById('lossRate').value) || 0;
+            const annualFee = parseFloat(document.getElementById('annualFee').value) || 0;
 
-            // 計算各項成本與節省
+            // 計算各項節省
             const monthlyTotal = trips * avgCost;
-            const cashFlowBenefit = monthlyTotal * 0.02 / 12;
+            const cashFlowBenefit = monthlyTotal * 0.05;
             const timeSaving = adminTime * hourlyRate;
-            const receiptSaving = trips * 0.05 * 60;
-            
+            const receiptSaving = trips * (lossRate / 100) * 50;
             const monthlySaving = cashFlowBenefit + timeSaving + receiptSaving;
             const annualSaving = monthlySaving * 12;
-            const annualTotal = monthlyTotal * 12;
 
-            // 效益指標計算
-            const fareEfficiencyRatio = monthlyTotal > 0 ? (monthlySaving / monthlyTotal) * 100 : 0;
-            const annualEfficiencyMultiple = annualTotal > 0 ? annualSaving / annualTotal : 0;
-            const totalTraditionalCost = timeSaving + receiptSaving + monthlyTotal;
-            const costReduction = totalTraditionalCost > 0 ? (monthlySaving / totalTraditionalCost) * 100 : 0;
-            const efficiencyGain = adminTime > 0 ? (timeSaving / (adminTime * hourlyRate)) * 100 : 0;
+            // 計算ROI指標
+            const paybackPeriod = annualFee / monthlySaving;
+            const annualROI = (annualSaving - annualFee) / annualFee;
+            const efficiencyGain = timeSaving / (adminTime * hourlyRate);
 
             // 更新顯示
             document.getElementById('monthlyTotal').textContent = formatNumber(monthlyTotal);
@@ -573,134 +520,138 @@
             document.getElementById('monthlySaving').textContent = formatNumber(monthlySaving);
             document.getElementById('annualSaving').textContent = formatNumber(annualSaving);
 
-            // ROI指標
-            document.getElementById('fareEfficiencyRatio').textContent = fareEfficiencyRatio.toFixed(1) + '%';
-            document.getElementById('annualEfficiencyMultiple').textContent = annualEfficiencyMultiple.toFixed(1) + '倍';
-            document.getElementById('costReduction').textContent = costReduction.toFixed(1) + '%';
-            document.getElementById('efficiencyGain').textContent = efficiencyGain.toFixed(0) + '%';
+            document.getElementById('paybackPeriod').textContent = paybackPeriod.toFixed(1);
+            document.getElementById('annualROI').textContent = (annualROI * 100).toFixed(0) + '%';
+            document.getElementById('efficiencyGain').textContent = (efficiencyGain * 100).toFixed(0) + '%';
 
-            // 情境分析
-            calculateScenarios(trips, avgCost, adminTime, hourlyRate);
-            
-            // 更新圖表
-            updateChart();
+            // 更新ROI卡片顏色
+            updateROIColors(annualROI, paybackPeriod);
+
+            // 更新情境分析
+            updateScenarioAnalysis(avgCost, adminTime, hourlyRate, lossRate, annualFee);
         }
 
-        function calculateScenarios(baseTrips, avgCost, adminTime, hourlyRate) {
+        function updateROIColors(roi, payback) {
+            const roiElement = document.getElementById('annualROI');
+            const paybackElement = document.getElementById('paybackPeriod');
+
+            // ROI 顏色邏輯
+            if (roi >= 1) {
+                roiElement.className = 'value positive';
+            } else if (roi >= 0.5) {
+                roiElement.className = 'value warning';
+            } else {
+                roiElement.className = 'value negative';
+            }
+
+            // 回收期顏色邏輯
+            if (payback <= 6) {
+                paybackElement.className = 'value positive';
+            } else if (payback <= 12) {
+                paybackElement.className = 'value warning';
+            } else {
+                paybackElement.className = 'value negative';
+            }
+        }
+
+        function updateScenarioAnalysis(avgCost, adminTime, hourlyRate, lossRate, annualFee) {
+            const trips = parseFloat(document.getElementById('trips').value);
+            
+            // 三種情境的差旅次數
             const scenarios = [
-                { factor: 0.6, prefix: 'conservative' },
-                { factor: 1.0, prefix: 'normal' },
-                { factor: 1.6, prefix: 'optimistic' }
+                { trips: 30, name: 'conservative' },
+                { trips: trips, name: 'normal' },
+                { trips: 80, name: 'optimistic' }
             ];
 
             scenarios.forEach(scenario => {
-                const trips = Math.round(baseTrips * scenario.factor);
-                const monthlyTotal = trips * avgCost;
-                const cashFlow = monthlyTotal * 0.02 / 12;
-                const timeS = adminTime * scenario.factor * hourlyRate;
-                const receiptS = trips * 0.05 * 60;
-                const totalSaving = cashFlow + timeS + receiptS;
-                const roi = monthlyTotal > 0 ? (totalSaving / monthlyTotal) * 100 : 0;
+                const monthlyTotal = scenario.trips * avgCost;
+                const cashFlow = monthlyTotal * 0.05;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * (lossRate / 100) * 50;
+                const monthlySave = cashFlow + timeSave + receiptSave;
+                const annualSave = monthlySave * 12;
+                const roi = (annualSave - annualFee) / annualFee;
+                const payback = annualFee / monthlySave;
 
-                document.getElementById(scenario.prefix + 'Trips').textContent = trips + '次';
-                document.getElementById(scenario.prefix + 'Saving').textContent = formatNumber(totalSaving);
-                document.getElementById(scenario.prefix + 'ROI').textContent = roi.toFixed(1) + '%';
-                document.getElementById(scenario.prefix + 'Annual').textContent = formatNumber(totalSaving * 12);
-            });
-        }
+                document.getElementById(scenario.name + 'Saving').textContent = formatNumber(monthlySave);
+                document.getElementById(scenario.name + 'ROI').textContent = (roi * 100).toFixed(0) + '%';
+                document.getElementById(scenario.name + 'Payback').textContent = payback.toFixed(1) + '個月';
 
-        function updateChart() {
-            const ctx = document.getElementById('roiChart').getContext('2d');
-            
-            if (roiChart) {
-                roiChart.destroy();
-            }
-
-            const trips = parseFloat(document.getElementById('trips').value) || 0;
-            const avgCost = parseFloat(document.getElementById('avgCost').value) || 0;
-            const adminTime = parseFloat(document.getElementById('adminTime').value) || 0;
-            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-
-            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-            const monthlyCost = trips * avgCost;
-            const monthlyBenefit = (monthlyCost * 0.02 / 12) + (adminTime * hourlyRate) + (trips * 0.05 * 60);
-            
-            roiChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: '累積節省金額',
-                        data: months.map((_, i) => monthlyBenefit * (i + 1)),
-                        borderColor: '#22c55e',
-                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                        tension: 0.1
-                    }, {
-                        label: '累積車資支出',
-                        data: months.map((_, i) => monthlyCost * (i + 1)),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '年度累積效益趨勢'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
+                // 設定ROI顏色
+                const roiElement = document.getElementById(scenario.name + 'ROI');
+                if (roi >= 1) {
+                    roiElement.className = 'positive';
+                } else if (roi >= 0.5) {
+                    roiElement.className = 'warning';
+                } else {
+                    roiElement.className = 'negative';
                 }
             });
+
+            document.getElementById('normalTrips').textContent = trips + '次';
         }
 
         function recalculate() {
+            // 添加動畫效果
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 500);
+            
             calculateROI();
-            // 添加視覺反饋
-            document.querySelectorAll('.result-value').forEach(el => {
-                el.style.animation = 'none';
-                setTimeout(() => {
-                    el.style.animation = 'highlight 0.8s ease-in-out';
-                }, 10);
-            });
         }
 
         function resetDefaults() {
-            document.getElementById('employees').value = 100;
-            document.getElementById('trips').value = 50;
-            document.getElementById('avgCost').value = 300;
-            document.getElementById('adminTime').value = 15;
-            document.getElementById('hourlyRate').value = 200;
-            document.getElementById('creditLimit').value = 50000;
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 20,
+                'hourlyRate': 200,
+                'lossRate': 10,
+                'annualFee': 25000
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
             calculateROI();
+            alert('數據已重設為預設值！');
         }
 
-        // 頁面載入時執行初始計算
-        document.addEventListener('DOMContentLoaded', function() {
-            calculateROI();
-        });
+        function generateReport() {
+            const roi = parseFloat(document.getElementById('annualROI').textContent);
+            const payback = parseFloat(document.getElementById('paybackPeriod').textContent);
+            const annualSaving = document.getElementById('annualSaving').textContent;
 
-        // 添加動畫效果
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes highlight {
-                0% { background-color: #f0fdf4; }
-                50% { background-color: #bbf7d0; }
-                100% { background-color: transparent; }
+            let assessment = '';
+            if (roi >= 140) {
+                assessment = '優秀的投資項目！強烈建議採用。';
+            } else if (roi >= 80) {
+                assessment = '良好的投資項目，建議採用。';
+            } else {
+                assessment = '需要進一步評估的項目。';
             }
-        `;
-        document.head.appendChild(style);
+
+            const report = `
+📊 ROI 分析報告
+================
+• 年度投資報酬率：${roi}%
+• 投資回收期：${payback} 個月
+• 年度總節省：${annualSaving}
+• 投資建議：${assessment}
+
+此報告基於當前輸入參數生成，實際效益可能因公司具體情況而有所差異。
+            `;
+
+            // 可以擴展為PDF匯出或其他格式
+            alert(report);
+        }
+
+        // 初始計算
+        calculateROI();
     </script>
 </body>
 </html>
