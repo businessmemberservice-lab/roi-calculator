@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>55688企業會員乘車服務 ROI計算器</title>
+    <title>55688台灣大車隊企業會員乘車服務 ROI計算器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -38,18 +40,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 10px;
             margin-bottom: 15px;
+        }
+
+        .company-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fbbf24;
         }
 
         .company-name {
             font-size: 2.5rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .company-number {
-            font-size: 2rem;
             font-weight: bold;
             color: #fbbf24;
         }
@@ -87,6 +89,39 @@
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 1px;
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            top: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
         }
 
         .input-group {
@@ -99,6 +134,7 @@
             margin-bottom: 8px;
             color: #374151;
             font-size: 1rem;
+            cursor: help;
         }
 
         .input-row {
@@ -248,6 +284,7 @@
             padding: 15px;
             text-align: center;
             font-weight: bold;
+            cursor: help;
         }
 
         .scenario-table td {
@@ -301,6 +338,15 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
+        .chart-container {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid #e5e7eb;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -308,12 +354,8 @@
                 padding: 20px;
             }
             
-            .company-name {
+            .company-name, .company-logo {
                 font-size: 2rem;
-            }
-            
-            .company-number {
-                font-size: 1.5rem;
             }
             
             .header h1 {
@@ -345,8 +387,8 @@
     <div class="container">
         <div class="header">
             <div class="logo-section">
+                <div class="company-logo">55688</div>
                 <div class="company-name">台灣大車隊</div>
-                <div class="company-number">55688</div>
             </div>
             <h1>企業會員乘車服務 ROI計算器</h1>
             <p>安全・舒適・貼心 | 專業版投資報酬率分析工具</p>
@@ -355,10 +397,20 @@
         <div class="main-content">
             <!-- 輸入區域 -->
             <div class="input-section">
-                <div class="section-title">📊 基本參數設定</div>
+                <div class="section-title tooltip">📊 基本參數設定
+                    <span class="tooltiptext">
+                        <strong>基本參數說明：</strong><br>
+                        設定您企業的基本使用情況，包括員工規模、搭乘頻率、平均車資等關鍵數據，系統將根據這些參數計算投資報酬率。
+                    </span>
+                </div>
                 
                 <div class="input-group">
-                    <label>公司員工人數</label>
+                    <label class="tooltip">公司員工人數
+                        <span class="tooltiptext">
+                            <strong>定義：</strong>貴公司總員工數量<br>
+                            <strong>用途：</strong>評估整體企業規模，影響管理成本計算
+                        </span>
+                    </label>
                     <div class="input-row">
                         <input type="number" id="employees" value="100" min="1">
                         <span class="unit">人</span>
@@ -366,7 +418,13 @@
                 </div>
 
                 <div class="input-group">
-                    <label>每月差旅次數</label>
+                    <label class="tooltip">每月乘車次數
+                        <span class="tooltiptext">
+                            <strong>定義：</strong>企業每月總搭乘計程車次數<br>
+                            <strong>公式：</strong>員工出差次數 + 商務接送次數 + 其他公務用車<br>
+                            <strong>影響：</strong>直接影響總成本與節省效益計算
+                        </span>
+                    </label>
                     <div class="input-row">
                         <input type="number" id="trips" value="50" min="1">
                         <span class="unit">次</span>
@@ -374,7 +432,13 @@
                 </div>
 
                 <div class="input-group">
-                    <label>平均每趟車資</label>
+                    <label class="tooltip">平均每趟車資
+                        <span class="tooltiptext">
+                            <strong>定義：</strong>每次搭乘計程車的平均費用<br>
+                            <strong>計算方式：</strong>總車資 ÷ 總搭乘次數<br>
+                            <strong>建議：</strong>可參考過去3個月的平均值
+                        </span>
+                    </label>
                     <div class="input-row">
                         <input type="number" id="avgCost" value="300" min="1">
                         <span class="unit">元</span>
@@ -382,7 +446,13 @@
                 </div>
 
                 <div class="input-group">
-                    <label>每月報帳處理時間</label>
+                    <label class="tooltip">每月報帳處理時間
+                        <span class="tooltiptext">
+                            <strong>定義：</strong>處理計程車報帳所需的總工時<br>
+                            <strong>包含：</strong>收據整理 + 核銷申請 + 審核確認 + 付款作業<br>
+                            <strong>公式：</strong>平均每筆處理時間 × 乘車次數
+                        </span>
+                    </label>
                     <div class="input-row">
                         <input type="number" id="adminTime" value="15" min="1">
                         <span class="unit">小時</span>
@@ -390,7 +460,13 @@
                 </div>
 
                 <div class="input-group">
-                    <label>行政人員時薪</label>
+                    <label class="tooltip">行政人員時薪
+                        <span class="tooltiptext">
+                            <strong>定義：</strong>處理報帳業務的行政人員平均時薪<br>
+                            <strong>計算：</strong>月薪 ÷ 工作時數，或參考市場行情<br>
+                            <strong>用途：</strong>計算行政處理成本
+                        </span>
+                    </label>
                     <div class="input-row">
                         <input type="number" id="hourlyRate" value="200" min="1">
                         <span class="unit">元/小時</span>
@@ -398,78 +474,139 @@
                 </div>
 
                 <div class="input-group">
-                    <label>服務手續費率</label>
+                    <label class="tooltip">月結信用額度
+                        <span class="tooltiptext">
+                            <strong>定義：</strong>企業會員可使用的月結付款額度<br>
+                            <strong>效益：</strong>延後付款改善現金流、統一帳務管理、免收據核銷<br>
+                            <strong>說明：</strong>只需支付實際搭乘的跳表車資，無額外手續費
+                        </span>
+                    </label>
                     <div class="input-row">
-                        <input type="number" id="serviceFeeRate" value="3" min="0" max="20" step="0.1">
-                        <span class="unit">%</span>
+                        <input type="number" id="creditLimit" value="50000" min="1000">
+                        <span class="unit">元</span>
                     </div>
                 </div>
             </div>
 
             <!-- 計算結果區域 -->
             <div class="results-section">
-                <div class="section-title">💰 成本效益計算</div>
+                <div class="section-title tooltip">💰 成本效益計算
+                    <span class="tooltiptext">
+                        <strong>成本效益分析：</strong><br>
+                        比較傳統報帳方式與企業會員服務的成本差異，量化各項節省效益，提供投資決策參考依據。
+                    </span>
+                </div>
                 
-                <div class="result-item">
-                    <span class="result-label">每月車資總額</span>
+                <div class="result-item tooltip">
+                    <span class="result-label">每月車資總額
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>每月乘車次數 × 平均每趟車資<br>
+                            <strong>說明：</strong>企業每月計程車支出總金額（純跳表車資，無額外費用）
+                        </span>
+                    </span>
                     <span class="result-value" id="monthlyTotal">$15,000</span>
                 </div>
 
-                <div class="result-item">
-                    <span class="result-label">服務手續費</span>
-                    <span class="result-value" id="serviceFee">$450</span>
+                <div class="result-item tooltip">
+                    <span class="result-label">資金週轉效益
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>每月車資總額 × 2.0% ÷ 12<br>
+                            <strong>說明：</strong>月結付款延遲30天帶來的現金流優化效益（年化2.0%投資收益）
+                        </span>
+                    </span>
+                    <span class="result-value" id="cashFlowBenefit">$250</span>
                 </div>
 
-                <div class="result-item">
-                    <span class="result-label">資金週轉效益</span>
-                    <span class="result-value" id="cashFlowBenefit">$225</span>
-                </div>
-
-                <div class="result-item">
-                    <span class="result-label">時間成本節省</span>
+                <div class="result-item tooltip">
+                    <span class="result-label">時間成本節省
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>每月報帳處理時間 × 行政人員時薪<br>
+                            <strong>說明：</strong>自動化帳務處理節省的人力成本
+                        </span>
+                    </span>
                     <span class="result-value" id="timeSaving">$3,000</span>
                 </div>
 
-                <div class="result-item">
-                    <span class="result-label">收據處理成本節省</span>
+                <div class="result-item tooltip">
+                    <span class="result-label">收據處理成本節省
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>每月乘車次數 × 0.05 × 60元<br>
+                            <strong>說明：</strong>電子帳單避免收據遺失重開的成本節省（假設5%遺失率）
+                        </span>
+                    </span>
                     <span class="result-value" id="receiptSaving">$150</span>
                 </div>
 
                 <div class="result-item" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
-                    <span class="result-label"><strong>每月淨節省</strong></span>
-                    <span class="result-value positive" id="monthlySaving">$2,925</span>
+                    <span class="result-label tooltip"><strong>每月總節省</strong>
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>資金週轉效益 + 時間成本節省 + 收據處理成本節省<br>
+                            <strong>說明：</strong>使用企業會員服務每月實際節省金額（純效益，無額外成本）
+                        </span>
+                    </span>
+                    <span class="result-value positive" id="monthlySaving">$3,400</span>
                 </div>
 
                 <div class="result-item" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
-                    <span class="result-label"><strong>年度淨節省</strong></span>
-                    <span class="result-value positive" id="annualSaving">$35,100</span>
+                    <span class="result-label tooltip"><strong>年度總節省</strong>
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>每月總節省 × 12<br>
+                            <strong>說明：</strong>年度累積節省總金額
+                        </span>
+                    </span>
+                    <span class="result-value positive" id="annualSaving">$40,800</span>
                 </div>
             </div>
         </div>
 
         <!-- ROI 分析區域 -->
         <div class="roi-section">
-            <div class="section-title">🎯 投資報酬率分析</div>
+            <div class="section-title tooltip">🎯 投資報酬率分析
+                <span class="tooltiptext">
+                    <strong>效益分析說明：</strong><br>
+                    由於55688企業會員服務無額外費用，此分析以「每投入1元車資可獲得的額外效益」為計算基準。
+                </span>
+            </div>
             <div class="roi-grid">
-                <div class="roi-card">
-                    <h3>月度回報率</h3>
-                    <div class="value" id="monthlyROI">650%</div>
-                    <small>每月投資報酬</small>
+                <div class="roi-card tooltip">
+                    <h3>車資效益比
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>(每月總節省 ÷ 每月車資總額) × 100%<br>
+                            <strong>意義：</strong>每支付100元車資可額外獲得的效益百分比
+                        </span>
+                    </h3>
+                    <div class="value" id="fareEfficiencyRatio">23%</div>
+                    <small>額外效益比率</small>
                 </div>
-                <div class="roi-card">
-                    <h3>年度回報率</h3>
-                    <div class="value" id="annualROI">7800%</div>
-                    <small>年度投資報酬</small>
+                <div class="roi-card tooltip">
+                    <h3>年度效益倍數
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>年度總節省 ÷ 年度車資總額<br>
+                            <strong>意義：</strong>相對於車資支出的年度效益倍數
+                        </span>
+                    </h3>
+                    <div class="value" id="annualEfficiencyMultiple">2.7倍</div>
+                    <small>年度效益倍增</small>
                 </div>
-                <div class="roi-card">
-                    <h3>成本節省率</h3>
-                    <div class="value" id="costReduction">87%</div>
+                <div class="roi-card tooltip">
+                    <h3>成本節省率
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>(總節省效益 ÷ (傳統處理成本 + 車資)) × 100%<br>
+                            <strong>意義：</strong>相較於傳統現金報帳方式的總成本節省
+                        </span>
+                    </h3>
+                    <div class="value" id="costReduction">18%</div>
                     <small>相較傳統方式</small>
                 </div>
-                <div class="roi-card">
-                    <h3>效率提升</h3>
-                    <div class="value" id="efficiencyGain">650%</div>
-                    <small>處理效率倍增</small>
+                <div class="roi-card tooltip">
+                    <h3>效率提升
+                        <span class="tooltiptext">
+                            <strong>計算公式：</strong>(時間成本節省 ÷ 原處理成本) × 100%<br>
+                            <strong>意義：</strong>行政處理效率提升百分比
+                        </span>
+                    </h3>
+                    <div class="value" id="efficiencyGain">100%</div>
+                    <small>處理效率翻倍</small>
                 </div>
             </div>
         </div>
@@ -481,51 +618,81 @@
                 <thead>
                     <tr>
                         <th>項目</th>
-                        <th>保守估計</th>
-                        <th>一般狀況</th>
-                        <th>樂觀預期</th>
+                        <th class="tooltip">保守估計
+                            <span class="tooltiptext">
+                                <strong>保守估計情境：</strong><br>
+                                • 使用量較低（約為一般情況的60%）<br>
+                                • 適用於：小型企業或初期試用階段<br>
+                                • 風險較低，但效益也相對有限
+                            </span>
+                        </th>
+                        <th class="tooltip">一般狀況
+                            <span class="tooltiptext">
+                                <strong>一般狀況情境：</strong><br>
+                                • 根據您目前輸入的參數計算<br>
+                                • 最符合實際使用情況<br>
+                                • 作為主要決策參考依據
+                            </span>
+                        </th>
+                        <th class="tooltip">樂觀預期
+                            <span class="tooltiptext">
+                                <strong>樂觀預期情境：</strong><br>
+                                • 使用量較高（約為一般情況的160%）<br>
+                                • 適用於：大型企業或業務擴張期<br>
+                                • 效益顯著，值得積極評估
+                            </span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>差旅次數</strong></td>
+                        <td><strong>乘車次數</strong></td>
                         <td>30次</td>
                         <td id="normalTrips">50次</td>
                         <td>80次</td>
                     </tr>
                     <tr>
-                        <td><strong>月淨節省金額</strong></td>
-                        <td id="conservativeSaving">$1,755</td>
-                        <td id="normalSaving">$2,925</td>
-                        <td id="optimisticSaving">$4,665</td>
+                        <td><strong>月總節省金額</strong></td>
+                        <td id="conservativeSaving">$2,055</td>
+                        <td id="normalSaving">$3,400</td>
+                        <td id="optimisticSaving">$5,435</td>
                     </tr>
                     <tr>
-                        <td><strong>月度ROI</strong></td>
-                        <td id="conservativeROI" class="positive">650%</td>
-                        <td id="normalROI" class="positive">650%</td>
-                        <td id="optimisticROI" class="positive">650%</td>
+                        <td><strong>車資效益比</strong></td>
+                        <td id="conservativeROI" class="positive">23%</td>
+                        <td id="normalROI" class="positive">23%</td>
+                        <td id="optimisticROI" class="positive">23%</td>
                     </tr>
                     <tr>
-                        <td><strong>年度節省</strong></td>
-                        <td id="conservativeAnnual">$21,060</td>
-                        <td id="normalAnnual">$35,100</td>
-                        <td id="optimisticAnnual">$55,980</td>
+                        <td><strong>年度總節省</strong></td>
+                        <td id="conservativeAnnual">$24,660</td>
+                        <td id="normalAnnual">$40,800</td>
+                        <td id="optimisticAnnual">$65,220</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- 圖表區域 -->
+        <div class="chart-container">
+            <div class="section-title">📊 視覺化分析圖表</div>
+            <canvas id="roiChart" width="400" height="200"></canvas>
         </div>
 
         <!-- 控制按鈕 -->
         <div class="control-buttons">
             <button class="btn btn-primary" onclick="recalculate()">🔄 重新計算</button>
             <button class="btn btn-secondary" onclick="resetDefaults()">↺ 重設預設值</button>
-            <button class="btn btn-primary" onclick="generateReport()">📊 生成報告</button>
+            <button class="btn btn-primary" onclick="generatePDFReport()">📊 生成PDF報告</button>
         </div>
     </div>
 
     <script>
+        // 全域變數
+        let roiChart;
+        
         // 自動計算功能
-        const inputs = ['employees', 'trips', 'avgCost', 'adminTime', 'hourlyRate', 'serviceFeeRate'];
+        const inputs = ['employees', 'trips', 'avgCost', 'adminTime', 'hourlyRate', 'creditLimit'];
         
         inputs.forEach(id => {
             document.getElementById(id).addEventListener('input', calculateROI);
@@ -537,86 +704,146 @@
                 currency: 'TWD',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
-            }).format(num).replace('NT$', '$');
-        }
+            }).format(num).replace('NT
 
-        function calculateROI() {
-            const employees = parseFloat(document.getElementById('employees').value) || 0;
-            const trips = parseFloat(document.getElementById('trips').value) || 0;
-            const avgCost = parseFloat(document.getElementById('avgCost').value) || 0;
-            const adminTime = parseFloat(document.getElementById('adminTime').value) || 0;
-            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
-            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value) || 0;
-
-            // 計算各項成本與節省
-            const monthlyTotal = trips * avgCost;
-            const serviceFee = monthlyTotal * (serviceFeeRate / 100);
-            const cashFlowBenefit = monthlyTotal * 0.015; // 1.5% 年化效益 / 12
-            const timeSaving = adminTime * hourlyRate;
-            const receiptSaving = trips * 0.05 * 60; // 5% 遺失率，每張重開60元
+        function updateChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
             
-            const monthlySaving = cashFlowBenefit + timeSaving + receiptSaving - serviceFee;
-            const annualSaving = monthlySaving * 12;
-
-            // 計算ROI指標
-            const monthlyROI = serviceFee > 0 ? (monthlySaving / serviceFee) * 100 : 0;
-            const annualROI = serviceFee > 0 ? (annualSaving / (serviceFee * 12)) * 100 : 0;
-            const costReduction = serviceFee > 0 ? ((timeSaving + receiptSaving - serviceFee) / (timeSaving + receiptSaving)) * 100 : 0;
-            const efficiencyGain = monthlyROI;
-
-            // 更新顯示
-            document.getElementById('monthlyTotal').textContent = formatNumber(monthlyTotal);
-            document.getElementById('serviceFee').textContent = formatNumber(serviceFee);
-            document.getElementById('cashFlowBenefit').textContent = formatNumber(cashFlowBenefit);
-            document.getElementById('timeSaving').textContent = formatNumber(timeSaving);
-            document.getElementById('receiptSaving').textContent = formatNumber(receiptSaving);
-            document.getElementById('monthlySaving').textContent = formatNumber(monthlySaving);
-            document.getElementById('annualSaving').textContent = formatNumber(annualSaving);
-
-            document.getElementById('monthlyROI').textContent = Math.round(monthlyROI) + '%';
-            document.getElementById('annualROI').textContent = Math.round(annualROI) + '%';
-            document.getElementById('costReduction').textContent = Math.round(costReduction) + '%';
-            document.getElementById('efficiencyGain').textContent = Math.round(efficiencyGain) + '%';
-
-            // 更新情境分析
-            updateScenarioAnalysis(avgCost, adminTime, hourlyRate, serviceFeeRate);
-        }
-
-        function updateScenarioAnalysis(avgCost, adminTime, hourlyRate, serviceFeeRate) {
+            // 獲取當前數據
             const trips = parseFloat(document.getElementById('trips').value);
+            const avgCost = parseFloat(document.getElementById('avgCost').value);
+            const adminTime = parseFloat(document.getElementById('adminTime').value);
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
             
             const scenarios = [
-                { trips: 30, name: 'conservative' },
-                { trips: trips, name: 'normal' },
-                { trips: 80, name: 'optimistic' }
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
             ];
+            
+            const data = scenarios.map(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const cashFlow = monthlyTotal * 0.02;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave;
+                return monthlySave;
+            });
 
-            scenarios.forEach(scenario => {
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月總節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'document.getElementById('hourlyRate').value);
+            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
+            ];
+            
+            const data = scenarios.map(scenario => {
                 const monthlyTotal = scenario.trips * avgCost;
                 const serviceFee = monthlyTotal * (serviceFeeRate / 100);
                 const cashFlow = monthlyTotal * 0.015;
                 const timeSave = adminTime * hourlyRate;
                 const receiptSave = scenario.trips * 0.05 * 60;
                 const monthlySave = cashFlow + timeSave + receiptSave - serviceFee;
-                const annualSave = monthlySave * 12;
-                const roi = serviceFee > 0 ? (monthlySave / serviceFee) * 100 : 0;
-
-                document.getElementById(scenario.name + 'Saving').textContent = formatNumber(monthlySave);
-                document.getElementById(scenario.name + 'ROI').textContent = Math.round(roi) + '%';
-                document.getElementById(scenario.name + 'Annual').textContent = formatNumber(annualSave);
-
-                // 設定ROI顏色
-                const roiElement = document.getElementById(scenario.name + 'ROI');
-                if (roi >= 300) {
-                    roiElement.className = 'positive';
-                } else if (roi >= 100) {
-                    roiElement.className = 'warning';
-                } else {
-                    roiElement.className = 'negative';
-                }
+                return monthlySave;
             });
 
-            document.getElementById('normalTrips').textContent = trips + '次';
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月淨節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function recalculate() {
@@ -646,37 +873,1372 @@
             alert('數據已重設為預設值！');
         }
 
-        function generateReport() {
-            const roi = parseFloat(document.getElementById('annualROI').textContent);
+        function generatePDFReport() {
+            // 獲取當前數據
+            const employees = document.getElementById('employees').value;
+            const trips = document.getElementById('trips').value;
+            const avgCost = document.getElementById('avgCost').value;
+            const monthlyTotal = document.getElementById('monthlyTotal').textContent;
+            const serviceFee = document.getElementById('serviceFee').textContent;
             const monthlySaving = document.getElementById('monthlySaving').textContent;
             const annualSaving = document.getElementById('annualSaving').textContent;
-
-            let assessment = '';
-            if (roi >= 5000) {
-                assessment = '優秀的投資項目！強烈建議採用。';
-            } else if (roi >= 1000) {
-                assessment = '良好的投資項目，建議採用。';
+            const monthlyROI = document.getElementById('monthlyROI').textContent;
+            const annualROI = document.getElementById('annualROI').textContent;
+            
+            // 評估建議
+            const roi = parseFloat(monthlyROI);
+            let recommendation = '';
+            let riskLevel = '';
+            
+            if (roi >= 500) {
+                recommendation = '強烈建議立即導入！投資報酬率極佳，風險極低。';
+                riskLevel = '極低風險';
+            } else if (roi >= 200) {
+                recommendation = '建議積極評估導入。投資報酬率良好，具有顯著效益。';
+                riskLevel = '低風險';
+            } else if (roi >= 100) {
+                recommendation = '可考慮導入。投資報酬率尚可，需評估其他因素。';
+                riskLevel = '中等風險';
             } else {
-                assessment = '需要進一步評估的項目。';
+                recommendation = '建議審慎評估。投資報酬率偏低，需深入分析成本效益。';
+                riskLevel = '較高風險';
             }
 
-            const report = `
-📊 55688企業乘車服務 ROI分析報告
-=====================================
-• 月度投資報酬率：${document.getElementById('monthlyROI').textContent}
-• 年度投資報酬率：${roi}%
-• 每月淨節省：${monthlySaving}
-• 年度淨節省：${annualSaving}
-• 投資建議：${assessment}
-
-此報告基於當前輸入參數生成，實際效益可能因公司具體情況而有所差異。
-            `;
-
-            alert(report);
+            // 創建PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // 設定中文字體（使用內建字體）
+            doc.setFont('helvetica');
+            
+            // 標題
+            doc.setFontSize(20);
+            doc.text('55688台灣大車隊企業會員ROI分析報告', 20, 30);
+            
+            // 基本資訊
+            doc.setFontSize(14);
+            doc.text('企業基本資訊', 20, 50);
+            doc.setFontSize(12);
+            doc.text(`員工人數: ${employees}人`, 25, 65);
+            doc.text(`每月乘車次數: ${trips}次`, 25, 75);
+            doc.text(`平均每趟車資: ${avgCost}`, 25, 85);
+            
+            // 財務分析
+            doc.setFontSize(14);
+            doc.text('財務效益分析', 20, 105);
+            doc.setFontSize(12);
+            doc.text(`每月車資總額: ${monthlyTotal}`, 25, 120);
+            doc.text(`管理服務費: ${serviceFee}`, 25, 130);
+            doc.text(`每月淨節省: ${monthlySaving}`, 25, 140);
+            doc.text(`年度淨節省: ${annualSaving}`, 25, 150);
+            
+            // ROI分析
+            doc.setFontSize(14);
+            doc.text('投資報酬率分析', 20, 170);
+            doc.setFontSize(12);
+            doc.text(`月度ROI: ${monthlyROI}`, 25, 185);
+            doc.text(`年度ROI: ${annualROI}`, 25, 195);
+            doc.text(`風險評估: ${riskLevel}`, 25, 205);
+            
+            // 結論建議
+            doc.setFontSize(14);
+            doc.text('專業建議', 20, 225);
+            doc.setFontSize(12);
+            
+            // 分行顯示建議文字
+            const recommendationLines = doc.splitTextToSize(recommendation, 160);
+            let yPos = 240;
+            recommendationLines.forEach(line => {
+                doc.text(line, 25, yPos);
+                yPos += 10;
+            });
+            
+            // 效益摘要
+            doc.setFontSize(14);
+            doc.text('效益摘要', 20, yPos + 10);
+            doc.setFontSize(11);
+            doc.text('✓ 自動化帳務處理，減少人力成本', 25, yPos + 25);
+            doc.text('✓ 月結付款方式，改善現金流', 25, yPos + 35);
+            doc.text('✓ 電子帳單管理，提升作業效率', 25, yPos + 45);
+            doc.text('✓ 專屬客服支援，保障服務品質', 25, yPos + 55);
+            
+            // 報告日期
+            const today = new Date().toLocaleDateString('zh-TW');
+            doc.setFontSize(10);
+            doc.text(`報告生成日期: ${today}`, 20, 280);
+            doc.text('55688台灣大車隊企業會員服務', 120, 280);
+            
+            // 儲存PDF
+            doc.save('55688企業會員ROI分析報告.pdf');
+            
+            // 顯示完成訊息
+            alert('PDF報告已成功生成並下載！\n\n' + 
+                  `投資建議: ${recommendation}\n` +
+                  `月度ROI: ${monthlyROI}\n` +
+                  `年度節省: ${annualSaving}`);
         }
 
-        // 初始計算
-        calculateROI();
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateROI();
+        });
+    </script>
+</body>
+</html>, '
+
+        function updateChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            // 獲取當前數據
+            const trips = parseFloat(document.getElementById('trips').value);
+            const avgCost = parseFloat(document.getElementById('avgCost').value);
+            const adminTime = parseFloat(document.getElementById('adminTime').value);
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
+            ];
+            
+            const data = scenarios.map(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const serviceFee = monthlyTotal * (serviceFeeRate / 100);
+                const cashFlow = monthlyTotal * 0.015;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave - serviceFee;
+                return monthlySave;
+            });
+
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月淨節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function recalculate() {
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 800);
+            
+            calculateROI();
+        }
+
+        function resetDefaults() {
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 15,
+                'hourlyRate': 200,
+                'serviceFeeRate': 3
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
+            calculateROI();
+            alert('數據已重設為預設值！');
+        }
+
+        function generatePDFReport() {
+            // 獲取當前數據
+            const employees = document.getElementById('employees').value;
+            const trips = document.getElementById('trips').value;
+            const avgCost = document.getElementById('avgCost').value;
+            const monthlyTotal = document.getElementById('monthlyTotal').textContent;
+            const serviceFee = document.getElementById('serviceFee').textContent;
+            const monthlySaving = document.getElementById('monthlySaving').textContent;
+            const annualSaving = document.getElementById('annualSaving').textContent;
+            const monthlyROI = document.getElementById('monthlyROI').textContent;
+            const annualROI = document.getElementById('annualROI').textContent;
+            
+            // 評估建議
+            const roi = parseFloat(monthlyROI);
+            let recommendation = '';
+            let riskLevel = '';
+            
+            if (roi >= 500) {
+                recommendation = '強烈建議立即導入！投資報酬率極佳，風險極低。';
+                riskLevel = '極低風險';
+            } else if (roi >= 200) {
+                recommendation = '建議積極評估導入。投資報酬率良好，具有顯著效益。';
+                riskLevel = '低風險';
+            } else if (roi >= 100) {
+                recommendation = '可考慮導入。投資報酬率尚可，需評估其他因素。';
+                riskLevel = '中等風險';
+            } else {
+                recommendation = '建議審慎評估。投資報酬率偏低，需深入分析成本效益。';
+                riskLevel = '較高風險';
+            }
+
+            // 創建PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // 設定中文字體（使用內建字體）
+            doc.setFont('helvetica');
+            
+            // 標題
+            doc.setFontSize(20);
+            doc.text('55688台灣大車隊企業會員ROI分析報告', 20, 30);
+            
+            // 基本資訊
+            doc.setFontSize(14);
+            doc.text('企業基本資訊', 20, 50);
+            doc.setFontSize(12);
+            doc.text(`員工人數: ${employees}人`, 25, 65);
+            doc.text(`每月乘車次數: ${trips}次`, 25, 75);
+            doc.text(`平均每趟車資: ${avgCost}`, 25, 85);
+            
+            // 財務分析
+            doc.setFontSize(14);
+            doc.text('財務效益分析', 20, 105);
+            doc.setFontSize(12);
+            doc.text(`每月車資總額: ${monthlyTotal}`, 25, 120);
+            doc.text(`管理服務費: ${serviceFee}`, 25, 130);
+            doc.text(`每月淨節省: ${monthlySaving}`, 25, 140);
+            doc.text(`年度淨節省: ${annualSaving}`, 25, 150);
+            
+            // ROI分析
+            doc.setFontSize(14);
+            doc.text('投資報酬率分析', 20, 170);
+            doc.setFontSize(12);
+            doc.text(`月度ROI: ${monthlyROI}`, 25, 185);
+            doc.text(`年度ROI: ${annualROI}`, 25, 195);
+            doc.text(`風險評估: ${riskLevel}`, 25, 205);
+            
+            // 結論建議
+            doc.setFontSize(14);
+            doc.text('專業建議', 20, 225);
+            doc.setFontSize(12);
+            
+            // 分行顯示建議文字
+            const recommendationLines = doc.splitTextToSize(recommendation, 160);
+            let yPos = 240;
+            recommendationLines.forEach(line => {
+                doc.text(line, 25, yPos);
+                yPos += 10;
+            });
+            
+            // 效益摘要
+            doc.setFontSize(14);
+            doc.text('效益摘要', 20, yPos + 10);
+            doc.setFontSize(11);
+            doc.text('✓ 自動化帳務處理，減少人力成本', 25, yPos + 25);
+            doc.text('✓ 月結付款方式，改善現金流', 25, yPos + 35);
+            doc.text('✓ 電子帳單管理，提升作業效率', 25, yPos + 45);
+            doc.text('✓ 專屬客服支援，保障服務品質', 25, yPos + 55);
+            
+            // 報告日期
+            const today = new Date().toLocaleDateString('zh-TW');
+            doc.setFontSize(10);
+            doc.text(`報告生成日期: ${today}`, 20, 280);
+            doc.text('55688台灣大車隊企業會員服務', 120, 280);
+            
+            // 儲存PDF
+            doc.save('55688企業會員ROI分析報告.pdf');
+            
+            // 顯示完成訊息
+            alert('PDF報告已成功生成並下載！\n\n' + 
+                  `投資建議: ${recommendation}\n` +
+                  `月度ROI: ${monthlyROI}\n` +
+                  `年度節省: ${annualSaving}`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateROI();
+        });
+    </script>
+</body>
+</html>);
+        }
+
+        function calculateROI() {
+            const employees = parseFloat(document.getElementById('employees').value) || 0;
+            const trips = parseFloat(document.getElementById('trips').value) || 0;
+            const avgCost = parseFloat(document.getElementById('avgCost').value) || 0;
+            const adminTime = parseFloat(document.getElementById('adminTime').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const creditLimit = parseFloat(document.getElementById('creditLimit').value) || 0;
+
+            // 計算各項成本與節省（無管理服務費）
+            const monthlyTotal = trips * avgCost;
+            const cashFlowBenefit = monthlyTotal * 0.02; // 2.0% 年化效益 ÷ 12 (月結延遲付款30天的資金效益)
+            const timeSaving = adminTime * hourlyRate;
+            const receiptSaving = trips * 0.05 * 60; // 5% 遺失率，每張重開60元
+            
+            const monthlySaving = cashFlowBenefit + timeSaving + receiptSaving; // 純節省，無額外成本
+            const annualSaving = monthlySaving * 12;
+            const annualTotal = monthlyTotal * 12;
+
+            // 重新定義效益指標（無服務費情況下）
+            const fareEfficiencyRatio = monthlyTotal > 0 ? (monthlySaving / monthlyTotal) * 100 : 0;
+            const annualEfficiencyMultiple = annualTotal > 0 ? annualSaving / annualTotal : 0;
+            const totalTraditionalCost = timeSaving + receiptSaving + monthlyTotal;
+            const costReduction = totalTraditionalCost > 0 ? (monthlySaving / totalTraditionalCost) * 100 : 0;
+            const efficiencyGain = adminTime > 0 ? ((timeSaving / (adminTime * hourlyRate)) * 100) : 0;
+
+            // 更新顯示
+            document.getElementById('monthlyTotal').textContent = formatNumber(monthlyTotal);
+            document.getElementById('cashFlowBenefit').textContent = formatNumber(cashFlowBenefit);
+            document.getElementById('timeSaving').textContent = formatNumber(timeSaving);
+            document.getElementById('receiptSaving').textContent = formatNumber(receiptSaving);
+            document.getElementById('monthlySaving').textContent = formatNumber(monthlySaving);
+            document.getElementById('annualSaving').textContent = formatNumber(annualSaving);
+
+            document.getElementById('fareEfficiencyRatio').textContent = Math.round(fareEfficiencyRatio) + '%';
+            document.getElementById('annualEfficiencyMultiple').textContent = annualEfficiencyMultiple.toFixed(1) + '倍';
+            document.getElementById('costReduction').textContent = Math.round(costReduction) + '%';
+            document.getElementById('efficiencyGain').textContent = Math.round(efficiencyGain) + '%';
+
+            // 更新情境分析
+            updateScenarioAnalysis(avgCost, adminTime, hourlyRate);
+            
+            // 更新圖表
+            updateChart();
+        }
+
+        function updateScenarioAnalysis(avgCost, adminTime, hourlyRate) {
+            const trips = parseFloat(document.getElementById('trips').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), name: 'conservative' },
+                { trips: trips, name: 'normal' },
+                { trips: Math.round(trips * 1.6), name: 'optimistic' }
+            ];
+
+            scenarios.forEach(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const cashFlow = monthlyTotal * 0.02;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave; // 純節省效益
+                const annualSave = monthlySave * 12;
+                const efficiencyRatio = monthlyTotal > 0 ? (monthlySave / monthlyTotal) * 100 : 0;
+
+                document.getElementById(scenario.name + 'Saving').textContent = formatNumber(monthlySave);
+                document.getElementById(scenario.name + 'ROI').textContent = Math.round(efficiencyRatio) + '%';
+                document.getElementById(scenario.name + 'Annual').textContent = formatNumber(annualSave);
+
+                // 設定效益比率顏色
+                const roiElement = document.getElementById(scenario.name + 'ROI');
+                if (efficiencyRatio >= 20) {
+                    roiElement.className = 'positive';
+                } else if (efficiencyRatio >= 10) {
+                    roiElement.className = 'warning';
+                } else {
+                    roiElement.className = 'negative';
+                }
+            });
+
+            document.getElementById('normalTrips').textContent = trips + '次';
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            // 獲取當前數據
+            const trips = parseFloat(document.getElementById('trips').value);
+            const avgCost = parseFloat(document.getElementById('avgCost').value);
+            const adminTime = parseFloat(document.getElementById('adminTime').value);
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
+            ];
+            
+            const data = scenarios.map(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const serviceFee = monthlyTotal * (serviceFeeRate / 100);
+                const cashFlow = monthlyTotal * 0.015;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave - serviceFee;
+                return monthlySave;
+            });
+
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月淨節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function recalculate() {
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 800);
+            
+            calculateROI();
+        }
+
+        function resetDefaults() {
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 15,
+                'hourlyRate': 200,
+                'serviceFeeRate': 3
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
+            calculateROI();
+            alert('數據已重設為預設值！');
+        }
+
+        function generatePDFReport() {
+            // 獲取當前數據
+            const employees = document.getElementById('employees').value;
+            const trips = document.getElementById('trips').value;
+            const avgCost = document.getElementById('avgCost').value;
+            const monthlyTotal = document.getElementById('monthlyTotal').textContent;
+            const serviceFee = document.getElementById('serviceFee').textContent;
+            const monthlySaving = document.getElementById('monthlySaving').textContent;
+            const annualSaving = document.getElementById('annualSaving').textContent;
+            const monthlyROI = document.getElementById('monthlyROI').textContent;
+            const annualROI = document.getElementById('annualROI').textContent;
+            
+            // 評估建議
+            const roi = parseFloat(monthlyROI);
+            let recommendation = '';
+            let riskLevel = '';
+            
+            if (roi >= 500) {
+                recommendation = '強烈建議立即導入！投資報酬率極佳，風險極低。';
+                riskLevel = '極低風險';
+            } else if (roi >= 200) {
+                recommendation = '建議積極評估導入。投資報酬率良好，具有顯著效益。';
+                riskLevel = '低風險';
+            } else if (roi >= 100) {
+                recommendation = '可考慮導入。投資報酬率尚可，需評估其他因素。';
+                riskLevel = '中等風險';
+            } else {
+                recommendation = '建議審慎評估。投資報酬率偏低，需深入分析成本效益。';
+                riskLevel = '較高風險';
+            }
+
+            // 創建PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // 設定中文字體（使用內建字體）
+            doc.setFont('helvetica');
+            
+            // 標題
+            doc.setFontSize(20);
+            doc.text('55688台灣大車隊企業會員ROI分析報告', 20, 30);
+            
+            // 基本資訊
+            doc.setFontSize(14);
+            doc.text('企業基本資訊', 20, 50);
+            doc.setFontSize(12);
+            doc.text(`員工人數: ${employees}人`, 25, 65);
+            doc.text(`每月乘車次數: ${trips}次`, 25, 75);
+            doc.text(`平均每趟車資: ${avgCost}`, 25, 85);
+            
+            // 財務分析
+            doc.setFontSize(14);
+            doc.text('財務效益分析', 20, 105);
+            doc.setFontSize(12);
+            doc.text(`每月車資總額: ${monthlyTotal}`, 25, 120);
+            doc.text(`管理服務費: ${serviceFee}`, 25, 130);
+            doc.text(`每月淨節省: ${monthlySaving}`, 25, 140);
+            doc.text(`年度淨節省: ${annualSaving}`, 25, 150);
+            
+            // ROI分析
+            doc.setFontSize(14);
+            doc.text('投資報酬率分析', 20, 170);
+            doc.setFontSize(12);
+            doc.text(`月度ROI: ${monthlyROI}`, 25, 185);
+            doc.text(`年度ROI: ${annualROI}`, 25, 195);
+            doc.text(`風險評估: ${riskLevel}`, 25, 205);
+            
+            // 結論建議
+            doc.setFontSize(14);
+            doc.text('專業建議', 20, 225);
+            doc.setFontSize(12);
+            
+            // 分行顯示建議文字
+            const recommendationLines = doc.splitTextToSize(recommendation, 160);
+            let yPos = 240;
+            recommendationLines.forEach(line => {
+                doc.text(line, 25, yPos);
+                yPos += 10;
+            });
+            
+            // 效益摘要
+            doc.setFontSize(14);
+            doc.text('效益摘要', 20, yPos + 10);
+            doc.setFontSize(11);
+            doc.text('✓ 自動化帳務處理，減少人力成本', 25, yPos + 25);
+            doc.text('✓ 月結付款方式，改善現金流', 25, yPos + 35);
+            doc.text('✓ 電子帳單管理，提升作業效率', 25, yPos + 45);
+            doc.text('✓ 專屬客服支援，保障服務品質', 25, yPos + 55);
+            
+            // 報告日期
+            const today = new Date().toLocaleDateString('zh-TW');
+            doc.setFontSize(10);
+            doc.text(`報告生成日期: ${today}`, 20, 280);
+            doc.text('55688台灣大車隊企業會員服務', 120, 280);
+            
+            // 儲存PDF
+            doc.save('55688企業會員ROI分析報告.pdf');
+            
+            // 顯示完成訊息
+            alert('PDF報告已成功生成並下載！\n\n' + 
+                  `投資建議: ${recommendation}\n` +
+                  `月度ROI: ${monthlyROI}\n` +
+                  `年度節省: ${annualSaving}`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateROI();
+        });
+    </script>
+</body>
+</html> + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }document.getElementById('hourlyRate').value);
+            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
+            ];
+            
+            const data = scenarios.map(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const serviceFee = monthlyTotal * (serviceFeeRate / 100);
+                const cashFlow = monthlyTotal * 0.015;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave - serviceFee;
+                return monthlySave;
+            });
+
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月淨節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function recalculate() {
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 800);
+            
+            calculateROI();
+        }
+
+        function resetDefaults() {
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 15,
+                'hourlyRate': 200,
+                'serviceFeeRate': 3
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
+            calculateROI();
+            alert('數據已重設為預設值！');
+        }
+
+        function generatePDFReport() {
+            // 獲取當前數據
+            const employees = document.getElementById('employees').value;
+            const trips = document.getElementById('trips').value;
+            const avgCost = document.getElementById('avgCost').value;
+            const monthlyTotal = document.getElementById('monthlyTotal').textContent;
+            const serviceFee = document.getElementById('serviceFee').textContent;
+            const monthlySaving = document.getElementById('monthlySaving').textContent;
+            const annualSaving = document.getElementById('annualSaving').textContent;
+            const monthlyROI = document.getElementById('monthlyROI').textContent;
+            const annualROI = document.getElementById('annualROI').textContent;
+            
+            // 評估建議
+            const roi = parseFloat(monthlyROI);
+            let recommendation = '';
+            let riskLevel = '';
+            
+            if (roi >= 500) {
+                recommendation = '強烈建議立即導入！投資報酬率極佳，風險極低。';
+                riskLevel = '極低風險';
+            } else if (roi >= 200) {
+                recommendation = '建議積極評估導入。投資報酬率良好，具有顯著效益。';
+                riskLevel = '低風險';
+            } else if (roi >= 100) {
+                recommendation = '可考慮導入。投資報酬率尚可，需評估其他因素。';
+                riskLevel = '中等風險';
+            } else {
+                recommendation = '建議審慎評估。投資報酬率偏低，需深入分析成本效益。';
+                riskLevel = '較高風險';
+            }
+
+            // 創建PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // 設定中文字體（使用內建字體）
+            doc.setFont('helvetica');
+            
+            // 標題
+            doc.setFontSize(20);
+            doc.text('55688台灣大車隊企業會員ROI分析報告', 20, 30);
+            
+            // 基本資訊
+            doc.setFontSize(14);
+            doc.text('企業基本資訊', 20, 50);
+            doc.setFontSize(12);
+            doc.text(`員工人數: ${employees}人`, 25, 65);
+            doc.text(`每月乘車次數: ${trips}次`, 25, 75);
+            doc.text(`平均每趟車資: ${avgCost}`, 25, 85);
+            
+            // 財務分析
+            doc.setFontSize(14);
+            doc.text('財務效益分析', 20, 105);
+            doc.setFontSize(12);
+            doc.text(`每月車資總額: ${monthlyTotal}`, 25, 120);
+            doc.text(`管理服務費: ${serviceFee}`, 25, 130);
+            doc.text(`每月淨節省: ${monthlySaving}`, 25, 140);
+            doc.text(`年度淨節省: ${annualSaving}`, 25, 150);
+            
+            // ROI分析
+            doc.setFontSize(14);
+            doc.text('投資報酬率分析', 20, 170);
+            doc.setFontSize(12);
+            doc.text(`月度ROI: ${monthlyROI}`, 25, 185);
+            doc.text(`年度ROI: ${annualROI}`, 25, 195);
+            doc.text(`風險評估: ${riskLevel}`, 25, 205);
+            
+            // 結論建議
+            doc.setFontSize(14);
+            doc.text('專業建議', 20, 225);
+            doc.setFontSize(12);
+            
+            // 分行顯示建議文字
+            const recommendationLines = doc.splitTextToSize(recommendation, 160);
+            let yPos = 240;
+            recommendationLines.forEach(line => {
+                doc.text(line, 25, yPos);
+                yPos += 10;
+            });
+            
+            // 效益摘要
+            doc.setFontSize(14);
+            doc.text('效益摘要', 20, yPos + 10);
+            doc.setFontSize(11);
+            doc.text('✓ 自動化帳務處理，減少人力成本', 25, yPos + 25);
+            doc.text('✓ 月結付款方式，改善現金流', 25, yPos + 35);
+            doc.text('✓ 電子帳單管理，提升作業效率', 25, yPos + 45);
+            doc.text('✓ 專屬客服支援，保障服務品質', 25, yPos + 55);
+            
+            // 報告日期
+            const today = new Date().toLocaleDateString('zh-TW');
+            doc.setFontSize(10);
+            doc.text(`報告生成日期: ${today}`, 20, 280);
+            doc.text('55688台灣大車隊企業會員服務', 120, 280);
+            
+            // 儲存PDF
+            doc.save('55688企業會員ROI分析報告.pdf');
+            
+            // 顯示完成訊息
+            alert('PDF報告已成功生成並下載！\n\n' + 
+                  `投資建議: ${recommendation}\n` +
+                  `月度ROI: ${monthlyROI}\n` +
+                  `年度節省: ${annualSaving}`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateROI();
+        });
+    </script>
+</body>
+</html>, '
+
+        function updateChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            // 獲取當前數據
+            const trips = parseFloat(document.getElementById('trips').value);
+            const avgCost = parseFloat(document.getElementById('avgCost').value);
+            const adminTime = parseFloat(document.getElementById('adminTime').value);
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
+            ];
+            
+            const data = scenarios.map(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const serviceFee = monthlyTotal * (serviceFeeRate / 100);
+                const cashFlow = monthlyTotal * 0.015;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave - serviceFee;
+                return monthlySave;
+            });
+
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月淨節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function recalculate() {
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 800);
+            
+            calculateROI();
+        }
+
+        function resetDefaults() {
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 15,
+                'hourlyRate': 200,
+                'serviceFeeRate': 3
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
+            calculateROI();
+            alert('數據已重設為預設值！');
+        }
+
+        function generatePDFReport() {
+            // 獲取當前數據
+            const employees = document.getElementById('employees').value;
+            const trips = document.getElementById('trips').value;
+            const avgCost = document.getElementById('avgCost').value;
+            const monthlyTotal = document.getElementById('monthlyTotal').textContent;
+            const serviceFee = document.getElementById('serviceFee').textContent;
+            const monthlySaving = document.getElementById('monthlySaving').textContent;
+            const annualSaving = document.getElementById('annualSaving').textContent;
+            const monthlyROI = document.getElementById('monthlyROI').textContent;
+            const annualROI = document.getElementById('annualROI').textContent;
+            
+            // 評估建議
+            const roi = parseFloat(monthlyROI);
+            let recommendation = '';
+            let riskLevel = '';
+            
+            if (roi >= 500) {
+                recommendation = '強烈建議立即導入！投資報酬率極佳，風險極低。';
+                riskLevel = '極低風險';
+            } else if (roi >= 200) {
+                recommendation = '建議積極評估導入。投資報酬率良好，具有顯著效益。';
+                riskLevel = '低風險';
+            } else if (roi >= 100) {
+                recommendation = '可考慮導入。投資報酬率尚可，需評估其他因素。';
+                riskLevel = '中等風險';
+            } else {
+                recommendation = '建議審慎評估。投資報酬率偏低，需深入分析成本效益。';
+                riskLevel = '較高風險';
+            }
+
+            // 創建PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // 設定中文字體（使用內建字體）
+            doc.setFont('helvetica');
+            
+            // 標題
+            doc.setFontSize(20);
+            doc.text('55688台灣大車隊企業會員ROI分析報告', 20, 30);
+            
+            // 基本資訊
+            doc.setFontSize(14);
+            doc.text('企業基本資訊', 20, 50);
+            doc.setFontSize(12);
+            doc.text(`員工人數: ${employees}人`, 25, 65);
+            doc.text(`每月乘車次數: ${trips}次`, 25, 75);
+            doc.text(`平均每趟車資: ${avgCost}`, 25, 85);
+            
+            // 財務分析
+            doc.setFontSize(14);
+            doc.text('財務效益分析', 20, 105);
+            doc.setFontSize(12);
+            doc.text(`每月車資總額: ${monthlyTotal}`, 25, 120);
+            doc.text(`管理服務費: ${serviceFee}`, 25, 130);
+            doc.text(`每月淨節省: ${monthlySaving}`, 25, 140);
+            doc.text(`年度淨節省: ${annualSaving}`, 25, 150);
+            
+            // ROI分析
+            doc.setFontSize(14);
+            doc.text('投資報酬率分析', 20, 170);
+            doc.setFontSize(12);
+            doc.text(`月度ROI: ${monthlyROI}`, 25, 185);
+            doc.text(`年度ROI: ${annualROI}`, 25, 195);
+            doc.text(`風險評估: ${riskLevel}`, 25, 205);
+            
+            // 結論建議
+            doc.setFontSize(14);
+            doc.text('專業建議', 20, 225);
+            doc.setFontSize(12);
+            
+            // 分行顯示建議文字
+            const recommendationLines = doc.splitTextToSize(recommendation, 160);
+            let yPos = 240;
+            recommendationLines.forEach(line => {
+                doc.text(line, 25, yPos);
+                yPos += 10;
+            });
+            
+            // 效益摘要
+            doc.setFontSize(14);
+            doc.text('效益摘要', 20, yPos + 10);
+            doc.setFontSize(11);
+            doc.text('✓ 自動化帳務處理，減少人力成本', 25, yPos + 25);
+            doc.text('✓ 月結付款方式，改善現金流', 25, yPos + 35);
+            doc.text('✓ 電子帳單管理，提升作業效率', 25, yPos + 45);
+            doc.text('✓ 專屬客服支援，保障服務品質', 25, yPos + 55);
+            
+            // 報告日期
+            const today = new Date().toLocaleDateString('zh-TW');
+            doc.setFontSize(10);
+            doc.text(`報告生成日期: ${today}`, 20, 280);
+            doc.text('55688台灣大車隊企業會員服務', 120, 280);
+            
+            // 儲存PDF
+            doc.save('55688企業會員ROI分析報告.pdf');
+            
+            // 顯示完成訊息
+            alert('PDF報告已成功生成並下載！\n\n' + 
+                  `投資建議: ${recommendation}\n` +
+                  `月度ROI: ${monthlyROI}\n` +
+                  `年度節省: ${annualSaving}`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateROI();
+        });
+    </script>
+</body>
+</html>);
+        }
+
+        function calculateROI() {
+            const employees = parseFloat(document.getElementById('employees').value) || 0;
+            const trips = parseFloat(document.getElementById('trips').value) || 0;
+            const avgCost = parseFloat(document.getElementById('avgCost').value) || 0;
+            const adminTime = parseFloat(document.getElementById('adminTime').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const creditLimit = parseFloat(document.getElementById('creditLimit').value) || 0;
+
+            // 計算各項成本與節省（無管理服務費）
+            const monthlyTotal = trips * avgCost;
+            const cashFlowBenefit = monthlyTotal * 0.02; // 2.0% 年化效益 ÷ 12 (月結延遲付款30天的資金效益)
+            const timeSaving = adminTime * hourlyRate;
+            const receiptSaving = trips * 0.05 * 60; // 5% 遺失率，每張重開60元
+            
+            const monthlySaving = cashFlowBenefit + timeSaving + receiptSaving; // 純節省，無額外成本
+            const annualSaving = monthlySaving * 12;
+            const annualTotal = monthlyTotal * 12;
+
+            // 重新定義效益指標（無服務費情況下）
+            const fareEfficiencyRatio = monthlyTotal > 0 ? (monthlySaving / monthlyTotal) * 100 : 0;
+            const annualEfficiencyMultiple = annualTotal > 0 ? annualSaving / annualTotal : 0;
+            const totalTraditionalCost = timeSaving + receiptSaving + monthlyTotal;
+            const costReduction = totalTraditionalCost > 0 ? (monthlySaving / totalTraditionalCost) * 100 : 0;
+            const efficiencyGain = adminTime > 0 ? ((timeSaving / (adminTime * hourlyRate)) * 100) : 0;
+
+            // 更新顯示
+            document.getElementById('monthlyTotal').textContent = formatNumber(monthlyTotal);
+            document.getElementById('cashFlowBenefit').textContent = formatNumber(cashFlowBenefit);
+            document.getElementById('timeSaving').textContent = formatNumber(timeSaving);
+            document.getElementById('receiptSaving').textContent = formatNumber(receiptSaving);
+            document.getElementById('monthlySaving').textContent = formatNumber(monthlySaving);
+            document.getElementById('annualSaving').textContent = formatNumber(annualSaving);
+
+            document.getElementById('fareEfficiencyRatio').textContent = Math.round(fareEfficiencyRatio) + '%';
+            document.getElementById('annualEfficiencyMultiple').textContent = annualEfficiencyMultiple.toFixed(1) + '倍';
+            document.getElementById('costReduction').textContent = Math.round(costReduction) + '%';
+            document.getElementById('efficiencyGain').textContent = Math.round(efficiencyGain) + '%';
+
+            // 更新情境分析
+            updateScenarioAnalysis(avgCost, adminTime, hourlyRate);
+            
+            // 更新圖表
+            updateChart();
+        }
+
+        function updateScenarioAnalysis(avgCost, adminTime, hourlyRate) {
+            const trips = parseFloat(document.getElementById('trips').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), name: 'conservative' },
+                { trips: trips, name: 'normal' },
+                { trips: Math.round(trips * 1.6), name: 'optimistic' }
+            ];
+
+            scenarios.forEach(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const cashFlow = monthlyTotal * 0.02;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave; // 純節省效益
+                const annualSave = monthlySave * 12;
+                const efficiencyRatio = monthlyTotal > 0 ? (monthlySave / monthlyTotal) * 100 : 0;
+
+                document.getElementById(scenario.name + 'Saving').textContent = formatNumber(monthlySave);
+                document.getElementById(scenario.name + 'ROI').textContent = Math.round(efficiencyRatio) + '%';
+                document.getElementById(scenario.name + 'Annual').textContent = formatNumber(annualSave);
+
+                // 設定效益比率顏色
+                const roiElement = document.getElementById(scenario.name + 'ROI');
+                if (efficiencyRatio >= 20) {
+                    roiElement.className = 'positive';
+                } else if (efficiencyRatio >= 10) {
+                    roiElement.className = 'warning';
+                } else {
+                    roiElement.className = 'negative';
+                }
+            });
+
+            document.getElementById('normalTrips').textContent = trips + '次';
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            // 獲取當前數據
+            const trips = parseFloat(document.getElementById('trips').value);
+            const avgCost = parseFloat(document.getElementById('avgCost').value);
+            const adminTime = parseFloat(document.getElementById('adminTime').value);
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const serviceFeeRate = parseFloat(document.getElementById('serviceFeeRate').value);
+            
+            const scenarios = [
+                { trips: Math.round(trips * 0.6), label: '保守估計' },
+                { trips: trips, label: '一般狀況' },
+                { trips: Math.round(trips * 1.6), label: '樂觀預期' }
+            ];
+            
+            const data = scenarios.map(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const serviceFee = monthlyTotal * (serviceFeeRate / 100);
+                const cashFlow = monthlyTotal * 0.015;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * 0.05 * 60;
+                const monthlySave = cashFlow + timeSave + receiptSave - serviceFee;
+                return monthlySave;
+            });
+
+            if (roiChart) {
+                roiChart.destroy();
+            }
+
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.label),
+                    datasets: [{
+                        label: '每月淨節省金額 (元)',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(34, 197, 94, 0.8)',
+                            'rgba(168, 85, 247, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(34, 197, 94)',
+                            'rgb(168, 85, 247)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同情境下的月度節省效益比較',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function recalculate() {
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 800);
+            
+            calculateROI();
+        }
+
+        function resetDefaults() {
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 15,
+                'hourlyRate': 200,
+                'serviceFeeRate': 3
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
+            calculateROI();
+            alert('數據已重設為預設值！');
+        }
+
+        function generatePDFReport() {
+            // 獲取當前數據
+            const employees = document.getElementById('employees').value;
+            const trips = document.getElementById('trips').value;
+            const avgCost = document.getElementById('avgCost').value;
+            const monthlyTotal = document.getElementById('monthlyTotal').textContent;
+            const serviceFee = document.getElementById('serviceFee').textContent;
+            const monthlySaving = document.getElementById('monthlySaving').textContent;
+            const annualSaving = document.getElementById('annualSaving').textContent;
+            const monthlyROI = document.getElementById('monthlyROI').textContent;
+            const annualROI = document.getElementById('annualROI').textContent;
+            
+            // 評估建議
+            const roi = parseFloat(monthlyROI);
+            let recommendation = '';
+            let riskLevel = '';
+            
+            if (roi >= 500) {
+                recommendation = '強烈建議立即導入！投資報酬率極佳，風險極低。';
+                riskLevel = '極低風險';
+            } else if (roi >= 200) {
+                recommendation = '建議積極評估導入。投資報酬率良好，具有顯著效益。';
+                riskLevel = '低風險';
+            } else if (roi >= 100) {
+                recommendation = '可考慮導入。投資報酬率尚可，需評估其他因素。';
+                riskLevel = '中等風險';
+            } else {
+                recommendation = '建議審慎評估。投資報酬率偏低，需深入分析成本效益。';
+                riskLevel = '較高風險';
+            }
+
+            // 創建PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // 設定中文字體（使用內建字體）
+            doc.setFont('helvetica');
+            
+            // 標題
+            doc.setFontSize(20);
+            doc.text('55688台灣大車隊企業會員ROI分析報告', 20, 30);
+            
+            // 基本資訊
+            doc.setFontSize(14);
+            doc.text('企業基本資訊', 20, 50);
+            doc.setFontSize(12);
+            doc.text(`員工人數: ${employees}人`, 25, 65);
+            doc.text(`每月乘車次數: ${trips}次`, 25, 75);
+            doc.text(`平均每趟車資: ${avgCost}`, 25, 85);
+            
+            // 財務分析
+            doc.setFontSize(14);
+            doc.text('財務效益分析', 20, 105);
+            doc.setFontSize(12);
+            doc.text(`每月車資總額: ${monthlyTotal}`, 25, 120);
+            doc.text(`管理服務費: ${serviceFee}`, 25, 130);
+            doc.text(`每月淨節省: ${monthlySaving}`, 25, 140);
+            doc.text(`年度淨節省: ${annualSaving}`, 25, 150);
+            
+            // ROI分析
+            doc.setFontSize(14);
+            doc.text('投資報酬率分析', 20, 170);
+            doc.setFontSize(12);
+            doc.text(`月度ROI: ${monthlyROI}`, 25, 185);
+            doc.text(`年度ROI: ${annualROI}`, 25, 195);
+            doc.text(`風險評估: ${riskLevel}`, 25, 205);
+            
+            // 結論建議
+            doc.setFontSize(14);
+            doc.text('專業建議', 20, 225);
+            doc.setFontSize(12);
+            
+            // 分行顯示建議文字
+            const recommendationLines = doc.splitTextToSize(recommendation, 160);
+            let yPos = 240;
+            recommendationLines.forEach(line => {
+                doc.text(line, 25, yPos);
+                yPos += 10;
+            });
+            
+            // 效益摘要
+            doc.setFontSize(14);
+            doc.text('效益摘要', 20, yPos + 10);
+            doc.setFontSize(11);
+            doc.text('✓ 自動化帳務處理，減少人力成本', 25, yPos + 25);
+            doc.text('✓ 月結付款方式，改善現金流', 25, yPos + 35);
+            doc.text('✓ 電子帳單管理，提升作業效率', 25, yPos + 45);
+            doc.text('✓ 專屬客服支援，保障服務品質', 25, yPos + 55);
+            
+            // 報告日期
+            const today = new Date().toLocaleDateString('zh-TW');
+            doc.setFontSize(10);
+            doc.text(`報告生成日期: ${today}`, 20, 280);
+            doc.text('55688台灣大車隊企業會員服務', 120, 280);
+            
+            // 儲存PDF
+            doc.save('55688企業會員ROI分析報告.pdf');
+            
+            // 顯示完成訊息
+            alert('PDF報告已成功生成並下載！\n\n' + 
+                  `投資建議: ${recommendation}\n` +
+                  `月度ROI: ${monthlyROI}\n` +
+                  `年度節省: ${annualSaving}`);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateROI();
+        });
     </script>
 </body>
 </html>
