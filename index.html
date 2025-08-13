@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業會員乘車服務 ROI計算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #fef3c7;
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid #f59e0b;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #92400e;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .input-row input:focus {
+            outline: none;
+            border-color: #d97706;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+            transform: scale(1.02);
+        }
+
+        .input-row .unit {
+            font-weight: bold;
+            color: #6b7280;
+            min-width: 60px;
+        }
+
+        .results-section {
+            background: #dbeafe;
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid #3b82f6;
+        }
+
+        .results-section .section-title {
+            color: #1e40af;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .result-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #1e40af;
+        }
+
+        .roi-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-radius: 15px;
+            padding: 30px;
+            border: 3px solid #22c55e;
+            margin-top: 20px;
+        }
+
+        .roi-section .section-title {
+            color: #15803d;
+            font-size: 1.6rem;
+            margin-bottom: 25px;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .roi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .roi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .roi-card h3 {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .roi-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #15803d;
+        }
+
+        .scenario-section {
+            grid-column: 1 / -1;
+            background: #f3f4f6;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .scenario-section .section-title {
+            color: #374151;
+            margin-bottom: 20px;
+        }
+
+        .scenario-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .scenario-table th {
+            background: #6366f1;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .scenario-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .scenario-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .positive { color: #16a34a !important; }
+        .warning { color: #ea580c !important; }
+        .negative { color: #dc2626 !important; }
+
+        .control-buttons {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #374151 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .highlight-animation {
+            animation: highlight 0.5s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0% { background-color: #fef3c7; }
+            50% { background-color: #fbbf24; }
+            100% { background-color: white; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>企業會員乘車服務 ROI計算器</h1>
+            <p>專業版投資報酬率分析工具 - 客戶洽談專用</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 輸入區域 -->
+            <div class="input-section">
+                <div class="section-title">📊 基本參數設定</div>
+                
+                <div class="input-group">
+                    <label>公司員工人數</label>
+                    <div class="input-row">
+                        <input type="number" id="employees" value="100" min="1">
+                        <span class="unit">人</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>每月差旅次數</label>
+                    <div class="input-row">
+                        <input type="number" id="trips" value="50" min="1">
+                        <span class="unit">次</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>平均每趟車資</label>
+                    <div class="input-row">
+                        <input type="number" id="avgCost" value="300" min="1">
+                        <span class="unit">元</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>每月報帳處理時間</label>
+                    <div class="input-row">
+                        <input type="number" id="adminTime" value="20" min="1">
+                        <span class="unit">小時</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>行政人員時薪</label>
+                    <div class="input-row">
+                        <input type="number" id="hourlyRate" value="200" min="1">
+                        <span class="unit">元/小時</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>收據遺失重開比例</label>
+                    <div class="input-row">
+                        <input type="number" id="lossRate" value="10" min="0" max="100">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>服務年費</label>
+                    <div class="input-row">
+                        <input type="number" id="annualFee" value="25000" min="1">
+                        <span class="unit">元/年</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 計算結果區域 -->
+            <div class="results-section">
+                <div class="section-title">💰 成本效益計算</div>
+                
+                <div class="result-item">
+                    <span class="result-label">每月車資總額</span>
+                    <span class="result-value" id="monthlyTotal">$15,000</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">資金週轉效益(5%)</span>
+                    <span class="result-value" id="cashFlowBenefit">$750</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">時間成本節省</span>
+                    <span class="result-value" id="timeSaving">$4,000</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">收據處理成本節省</span>
+                    <span class="result-value" id="receiptSaving">$250</span>
+                </div>
+
+                <div class="result-item" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
+                    <span class="result-label">每月總節省</span>
+                    <span class="result-value positive" id="monthlySaving">$5,000</span>
+                </div>
+
+                <div class="result-item" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
+                    <span class="result-label">年度總節省</span>
+                    <span class="result-value positive" id="annualSaving">$60,000</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROI 分析區域 -->
+        <div class="roi-section">
+            <div class="section-title">🎯 投資報酬率分析</div>
+            <div class="roi-grid">
+                <div class="roi-card">
+                    <h3>投資回收期</h3>
+                    <div class="value" id="paybackPeriod">5.0</div>
+                    <small>個月</small>
+                </div>
+                <div class="roi-card">
+                    <h3>年度 ROI</h3>
+                    <div class="value" id="annualROI">140%</div>
+                </div>
+                <div class="roi-card">
+                    <h3>效率提升</h3>
+                    <div class="value" id="efficiencyGain">125%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 情境分析 -->
+        <div class="scenario-section">
+            <div class="section-title">📈 不同使用量情境比較</div>
+            <table class="scenario-table">
+                <thead>
+                    <tr>
+                        <th>項目</th>
+                        <th>保守估計</th>
+                        <th>一般狀況</th>
+                        <th>樂觀預期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>差旅次數</strong></td>
+                        <td>30次</td>
+                        <td id="normalTrips">50次</td>
+                        <td>80次</td>
+                    </tr>
+                    <tr>
+                        <td><strong>月節省金額</strong></td>
+                        <td id="conservativeSaving">$3,850</td>
+                        <td id="normalSaving">$5,000</td>
+                        <td id="optimisticSaving">$7,400</td>
+                    </tr>
+                    <tr>
+                        <td><strong>年度ROI</strong></td>
+                        <td id="conservativeROI" class="positive">85%</td>
+                        <td id="normalROI" class="positive">140%</td>
+                        <td id="optimisticROI" class="positive">255%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>回收期</strong></td>
+                        <td id="conservativePayback">6.5個月</td>
+                        <td id="normalPayback">5.0個月</td>
+                        <td id="optimisticPayback">3.4個月</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 控制按鈕 -->
+        <div class="control-buttons">
+            <button class="btn btn-primary" onclick="recalculate()">🔄 重新計算</button>
+            <button class="btn btn-secondary" onclick="resetDefaults()">↺ 重設預設值</button>
+            <button class="btn btn-primary" onclick="generateReport()">📊 生成報告</button>
+        </div>
+    </div>
+
+    <script>
+        // 自動計算功能
+        const inputs = ['employees', 'trips', 'avgCost', 'adminTime', 'hourlyRate', 'lossRate', 'annualFee'];
+        
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateROI);
+        });
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('zh-TW', {
+                style: 'currency',
+                currency: 'TWD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num).replace('NT$', '$');
+        }
+
+        function calculateROI() {
+            const employees = parseFloat(document.getElementById('employees').value) || 0;
+            const trips = parseFloat(document.getElementById('trips').value) || 0;
+            const avgCost = parseFloat(document.getElementById('avgCost').value) || 0;
+            const adminTime = parseFloat(document.getElementById('adminTime').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const lossRate = parseFloat(document.getElementById('lossRate').value) || 0;
+            const annualFee = parseFloat(document.getElementById('annualFee').value) || 0;
+
+            // 計算各項節省
+            const monthlyTotal = trips * avgCost;
+            const cashFlowBenefit = monthlyTotal * 0.05;
+            const timeSaving = adminTime * hourlyRate;
+            const receiptSaving = trips * (lossRate / 100) * 50;
+            const monthlySaving = cashFlowBenefit + timeSaving + receiptSaving;
+            const annualSaving = monthlySaving * 12;
+
+            // 計算ROI指標
+            const paybackPeriod = annualFee / monthlySaving;
+            const annualROI = (annualSaving - annualFee) / annualFee;
+            const efficiencyGain = timeSaving / (adminTime * hourlyRate);
+
+            // 更新顯示
+            document.getElementById('monthlyTotal').textContent = formatNumber(monthlyTotal);
+            document.getElementById('cashFlowBenefit').textContent = formatNumber(cashFlowBenefit);
+            document.getElementById('timeSaving').textContent = formatNumber(timeSaving);
+            document.getElementById('receiptSaving').textContent = formatNumber(receiptSaving);
+            document.getElementById('monthlySaving').textContent = formatNumber(monthlySaving);
+            document.getElementById('annualSaving').textContent = formatNumber(annualSaving);
+
+            document.getElementById('paybackPeriod').textContent = paybackPeriod.toFixed(1);
+            document.getElementById('annualROI').textContent = (annualROI * 100).toFixed(0) + '%';
+            document.getElementById('efficiencyGain').textContent = (efficiencyGain * 100).toFixed(0) + '%';
+
+            // 更新ROI卡片顏色
+            updateROIColors(annualROI, paybackPeriod);
+
+            // 更新情境分析
+            updateScenarioAnalysis(avgCost, adminTime, hourlyRate, lossRate, annualFee);
+        }
+
+        function updateROIColors(roi, payback) {
+            const roiElement = document.getElementById('annualROI');
+            const paybackElement = document.getElementById('paybackPeriod');
+
+            // ROI 顏色邏輯
+            if (roi >= 1) {
+                roiElement.className = 'value positive';
+            } else if (roi >= 0.5) {
+                roiElement.className = 'value warning';
+            } else {
+                roiElement.className = 'value negative';
+            }
+
+            // 回收期顏色邏輯
+            if (payback <= 6) {
+                paybackElement.className = 'value positive';
+            } else if (payback <= 12) {
+                paybackElement.className = 'value warning';
+            } else {
+                paybackElement.className = 'value negative';
+            }
+        }
+
+        function updateScenarioAnalysis(avgCost, adminTime, hourlyRate, lossRate, annualFee) {
+            const trips = parseFloat(document.getElementById('trips').value);
+            
+            // 三種情境的差旅次數
+            const scenarios = [
+                { trips: 30, name: 'conservative' },
+                { trips: trips, name: 'normal' },
+                { trips: 80, name: 'optimistic' }
+            ];
+
+            scenarios.forEach(scenario => {
+                const monthlyTotal = scenario.trips * avgCost;
+                const cashFlow = monthlyTotal * 0.05;
+                const timeSave = adminTime * hourlyRate;
+                const receiptSave = scenario.trips * (lossRate / 100) * 50;
+                const monthlySave = cashFlow + timeSave + receiptSave;
+                const annualSave = monthlySave * 12;
+                const roi = (annualSave - annualFee) / annualFee;
+                const payback = annualFee / monthlySave;
+
+                document.getElementById(scenario.name + 'Saving').textContent = formatNumber(monthlySave);
+                document.getElementById(scenario.name + 'ROI').textContent = (roi * 100).toFixed(0) + '%';
+                document.getElementById(scenario.name + 'Payback').textContent = payback.toFixed(1) + '個月';
+
+                // 設定ROI顏色
+                const roiElement = document.getElementById(scenario.name + 'ROI');
+                if (roi >= 1) {
+                    roiElement.className = 'positive';
+                } else if (roi >= 0.5) {
+                    roiElement.className = 'warning';
+                } else {
+                    roiElement.className = 'negative';
+                }
+            });
+
+            document.getElementById('normalTrips').textContent = trips + '次';
+        }
+
+        function recalculate() {
+            // 添加動畫效果
+            document.querySelector('.results-section').classList.add('highlight-animation');
+            setTimeout(() => {
+                document.querySelector('.results-section').classList.remove('highlight-animation');
+            }, 500);
+            
+            calculateROI();
+        }
+
+        function resetDefaults() {
+            const defaults = {
+                'employees': 100,
+                'trips': 50,
+                'avgCost': 300,
+                'adminTime': 20,
+                'hourlyRate': 200,
+                'lossRate': 10,
+                'annualFee': 25000
+            };
+
+            Object.keys(defaults).forEach(id => {
+                document.getElementById(id).value = defaults[id];
+            });
+
+            calculateROI();
+            alert('數據已重設為預設值！');
+        }
+
+        function generateReport() {
+            const roi = parseFloat(document.getElementById('annualROI').textContent);
+            const payback = parseFloat(document.getElementById('paybackPeriod').textContent);
+            const annualSaving = document.getElementById('annualSaving').textContent;
+
+            let assessment = '';
+            if (roi >= 140) {
+                assessment = '優秀的投資項目！強烈建議採用。';
+            } else if (roi >= 80) {
+                assessment = '良好的投資項目，建議採用。';
+            } else {
+                assessment = '需要進一步評估的項目。';
+            }
+
+            const report = `
+📊 ROI 分析報告
+================
+• 年度投資報酬率：${roi}%
+• 投資回收期：${payback} 個月
+• 年度總節省：${annualSaving}
+• 投資建議：${assessment}
+
+此報告基於當前輸入參數生成，實際效益可能因公司具體情況而有所差異。
+            `;
+
+            // 可以擴展為PDF匯出或其他格式
+            alert(report);
+        }
+
+        // 初始計算
+        calculateROI();
+    </script>
+</body>
+</html>
